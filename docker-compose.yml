@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:  # Serviço da sua aplicação (Spring Boot, por exemplo)
+    container_name: chapiusuarios-app
+    build:
+      context: .            # Diretório onde está o Dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - "9111:9111"         # Altere conforme a porta usada pela sua aplicação
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chapiusuarios_db
+      SPRING_DATASOURCE_USERNAME: chapi_user
+      SPRING_DATASOURCE_PASSWORD: chapi_pass
+    networks:
+      - chapiusuarios-network
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_chapiusuarios
+    restart: always
+    ports:
+      - "5467:5432"
+    environment:
+      POSTGRES_DB: chapiusuarios_db
+      POSTGRES_USER: chapi_user
+      POSTGRES_PASSWORD: chapi_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chapiusuarios-network
+
+volumes:
+  postgres_data:
+
+networks:
+  chapiusuarios-network:
+    driver: bridge
